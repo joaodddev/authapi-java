@@ -17,18 +17,19 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
+    
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponseDTO> handleValidationExceptions(
             MethodArgumentNotValidException ex,
-            WebRequest request) {
+            WebRequest request
+    ) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
-
+        
         ErrorResponseDTO response = ErrorResponseDTO.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.BAD_REQUEST.value())
@@ -37,14 +38,15 @@ public class GlobalExceptionHandler {
                 .path(request.getDescription(false).replace("uri=", ""))
                 .errors(errors)
                 .build();
-
+        
         return ResponseEntity.badRequest().body(response);
     }
-
-    @ExceptionHandler({ RuntimeException.class, UsernameNotFoundException.class })
+    
+    @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponseDTO> handleRuntimeException(
             RuntimeException ex,
-            WebRequest request) {
+            WebRequest request
+    ) {
         ErrorResponseDTO response = ErrorResponseDTO.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.BAD_REQUEST.value())
@@ -52,14 +54,15 @@ public class GlobalExceptionHandler {
                 .message(ex.getMessage())
                 .path(request.getDescription(false).replace("uri=", ""))
                 .build();
-
+        
         return ResponseEntity.badRequest().body(response);
     }
-
+    
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponseDTO> handleBadCredentialsException(
             BadCredentialsException ex,
-            WebRequest request) {
+            WebRequest request
+    ) {
         ErrorResponseDTO response = ErrorResponseDTO.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.UNAUTHORIZED.value())
@@ -67,14 +70,15 @@ public class GlobalExceptionHandler {
                 .message("Email ou senha inválidos")
                 .path(request.getDescription(false).replace("uri=", ""))
                 .build();
-
+        
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
-
+    
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDTO> handleGenericException(
             Exception ex,
-            WebRequest request) {
+            WebRequest request
+    ) {
         ErrorResponseDTO response = ErrorResponseDTO.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
@@ -82,7 +86,7 @@ public class GlobalExceptionHandler {
                 .message(ex.getMessage())
                 .path(request.getDescription(false).replace("uri=", ""))
                 .build();
-
+        
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 }
