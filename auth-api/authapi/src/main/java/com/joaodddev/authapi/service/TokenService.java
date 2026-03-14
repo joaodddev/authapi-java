@@ -69,7 +69,6 @@ public class TokenService {
         return extractClaim(token, Claims::getSubject);
     }
 
-    // ⭐ TORNANDO PÚBLICO PARA ACESSO EXTERNO
     public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
